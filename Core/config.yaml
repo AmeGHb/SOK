@@ -1,0 +1,8 @@
+SERVICE_NAME: transaction-service
+
+HTTP_PORT: 3000
+KAFKA_PORT: 9092
+DATABASE_URL: postgresql://postgres:psql213@localhost:5432/users
+DATABASE_ATTEMPTS: 5
+DATABASE_SECONDS: 5
+DATABASE_DELAY: 5
