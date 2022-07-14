@@ -9,7 +9,7 @@ import (
 
 func TestConfigNew(t *testing.T) {
 
-	newConf := config.New()
+	newConf := config.New("config", ".\\config\\")
 	if newConf == nil {
 		t.Fatal("/config.New()/ Expected config but got none")
 	}
@@ -17,7 +17,7 @@ func TestConfigNew(t *testing.T) {
 
 func TestGet(t *testing.T) {
 
-	newConf := config.New()
+	newConf := config.New("config", ".\\config\\")
 
 	if strconv.Itoa(newConf.HttpPort) != newConf.GetHttpPort() {
 		t.Errorf("/config.GetHttpPort()/ Exprcted %d but got %s", newConf.HttpPort, newConf.GetHttpPort())

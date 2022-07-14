@@ -3,6 +3,7 @@ package kafka
 import (
 	"context"
 	"errors"
+	"log"
 	"strings"
 
 	"mail-sender/config"
@@ -46,7 +47,7 @@ func (c *ClientR) getMessage() (kafka.Message, error) {
 
 // FetchProcessCommit сначала выбирает сообщение из очереди,
 // потом обрабатывает, после чего подтверждает.
-func (c *ClientR) FetchProcessCommit(conf *config.Config) error {
+func (c *ClientR) FetchProcessCommit(conf *config.Config, logger *log.Logger) error {
 	// Выборка очередного сообщения из Kafka.
 	msg, err := c.Reader.FetchMessage(context.Background())
 	if err != nil {
@@ -58,6 +59,8 @@ func (c *ClientR) FetchProcessCommit(conf *config.Config) error {
 	if err != nil {
 		return err
 	}
+
+	log.Println("Email was sent successfully.")
 
 	// Подтверждение сообщения как обработанного.
 	err = c.Reader.CommitMessages(context.Background(), msg)

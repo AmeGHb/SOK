@@ -18,7 +18,7 @@ var (
 
 func Start(ctx context.Context) {
 
-	conf := config.New()
+	conf := config.New("config", ".\\config\\")
 	logger := log.New(os.Stderr, "", log.Lshortfile)
 
 	go httpServer.New(conf, logger)
@@ -37,7 +37,7 @@ func Start(ctx context.Context) {
 	defer kafkaClient.Reader.Close()
 
 	for {
-		err := kafkaClient.FetchProcessCommit(conf)
+		err := kafkaClient.FetchProcessCommit(conf, logger)
 
 		if err != nil {
 			logger.Printf("Kafka runtime error. Error: %v", err)

@@ -1,32 +1,26 @@
 package mail_test
 
 import (
-	"log"
-	"os"
+	// "log"
+	// "os"
 	"testing"
 
 	"mail-sender/config"
 	"mail-sender/internal/mail"
-	httpServer "mail-sender/internal/server"
+	// httpServer "mail-sender/internal/server"
 )
 
 func TestMail(t *testing.T) {
 
-	TestConfig := config.Config{
-		HttpPort:  4000,
-		KafkaPort: 9092,
-		MailPort:  4000,
-		MailHost:  "localhost",
-		MailFrom:  "NeveR2MorE@yandex.ru",
-	}
-	logger := log.New(os.Stderr, "", log.Lshortfile)
+	testConf := config.New("config_test", ".")
+	// testLogger := log.New(os.Stderr, "", log.Lshortfile)
 
-	go httpServer.New(&TestConfig, logger)
+	// go httpServer.New(testConf, testLogger)
 
 	testEmail := "NeveR5MorE@yandex.ru"
 	testBody := "Your transaction has been successfully finished."
 
-	err := mail.SendMail(testEmail, testBody, &TestConfig)
+	err := mail.SendMail(testEmail, testBody, testConf)
 	if err != nil {
 		t.Fatalf("/mail.SendMail()/ Mail send failed: \n%v", err)
 	}

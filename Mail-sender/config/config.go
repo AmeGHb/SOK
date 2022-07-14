@@ -8,17 +8,18 @@ import (
 )
 
 type Config struct {
-	HttpPort  int
-	KafkaPort int
-	MailPort  int
-	MailHost  string
-	MailFrom  string
+	HttpPort     int
+	KafkaPort    int
+	MailPort     int
+	MailHost     string
+	MailFrom     string
+	MailPassword string
 }
 
-func New() *Config {
+func New(configName, configAdress string) *Config {
 
-	viper.SetConfigName("config")
-	viper.AddConfigPath(".")
+	viper.SetConfigName(configName)
+	viper.AddConfigPath(configAdress)
 	viper.AutomaticEnv()
 	viper.SetConfigType("yaml")
 
@@ -52,12 +53,18 @@ func New() *Config {
 		log.Println("Mail was not loaded from config.yaml")
 	}
 
+	MailPassword, ok := viper.Get("MAIL_PASSWORD").(string)
+	if !ok {
+		log.Println("Mail password was not loaded from config.yaml")
+	}
+
 	return &Config{
-		HttpPort:  HttpPort,
-		KafkaPort: KafkaPort,
-		MailPort:  MailPort,
-		MailHost:  MailHost,
-		MailFrom:  MailFrom,
+		HttpPort:     HttpPort,
+		KafkaPort:    KafkaPort,
+		MailPort:     MailPort,
+		MailHost:     MailHost,
+		MailFrom:     MailFrom,
+		MailPassword: MailPassword,
 	}
 }
 
@@ -79,4 +86,8 @@ func (c *Config) GetMailHost() string {
 
 func (c *Config) GetMailFrom() string {
 	return c.MailFrom
+}
+
+func (c *Config) GetMailPassword() string {
+	return c.MailPassword
 }
