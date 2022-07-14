@@ -1,0 +1,7 @@
+SERVICE_NAME: mail-service
+
+HTTP_PORT: 4000
+KAFKA_PORT: 9092
+MAIL_PORT: 587
+MAIL_HOST: localhost
+MAIL_FROM: NeveR2MorE@yandex.ru

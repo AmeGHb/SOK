@@ -10,7 +10,9 @@ import (
 type Config struct {
 	HttpPort  int
 	KafkaPort int
-	SMTPPort  int
+	MailPort  int
+	MailHost  string
+	MailFrom  string
 }
 
 func New() *Config {
@@ -22,7 +24,7 @@ func New() *Config {
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Fatalf("Error while reading config file %s", err)
+		log.Fatalf("Error while reading config file: %s", err)
 	}
 
 	HttpPort, ok := viper.Get("HTTP_PORT").(int)
@@ -35,15 +37,27 @@ func New() *Config {
 		log.Println("Http port was not loaded from config.yaml")
 	}
 
-	SMTPPort, ok := viper.Get("SMTP_PORT").(int)
+	MailPort, ok := viper.Get("MAIL_PORT").(int)
 	if !ok {
-		log.Println("SMTP port was not loaded from config.yaml")
+		log.Println("Mail port was not loaded from config.yaml")
+	}
+
+	MailHost, ok := viper.Get("MAIL_HOST").(string)
+	if !ok {
+		log.Println("Mail host was not loaded from config.yaml")
+	}
+
+	MailFrom, ok := viper.Get("MAIL_FROM").(string)
+	if !ok {
+		log.Println("Mail was not loaded from config.yaml")
 	}
 
 	return &Config{
 		HttpPort:  HttpPort,
 		KafkaPort: KafkaPort,
-		SMTPPort:  SMTPPort,
+		MailPort:  MailPort,
+		MailHost:  MailHost,
+		MailFrom:  MailFrom,
 	}
 }
 
@@ -55,6 +69,14 @@ func (c *Config) GetKafkaPort() string {
 	return fmt.Sprintf("%d", c.KafkaPort)
 }
 
-func (c *Config) GetSMTPPort() string {
-	return fmt.Sprintf("%d", c.SMTPPort)
+func (c *Config) GetMailPort() int {
+	return c.MailPort
+}
+
+func (c *Config) GetMailHost() string {
+	return c.MailHost
+}
+
+func (c *Config) GetMailFrom() string {
+	return c.MailFrom
 }

@@ -1,34 +1,22 @@
 package mail
 
 import (
-	"bytes"
-	"log"
-	"net/smtp"
+	"mail-sender/config"
+
+	"gopkg.in/gomail.v2"
 )
 
-func SendMail(email, body string) error {
+func SendMail(email, body string, conf *config.Config) error {
 
-	client, err := smtp.Dial("mail.example.com:25")
-	if err != nil {
-		log.Fatal(err)
+	message := gomail.NewMessage()
+	message.SetHeader("From", conf.MailFrom)
+	message.SetHeader("To", email)
+	message.SetHeader("Subject", "Transaction inforamtion.")
+	message.SetBody("text/plain", body)
+
+	d := gomail.Dialer{Host: conf.MailHost, Port: conf.MailPort}
+	if err := d.DialAndSend(message); err != nil {
+		return err
 	}
-	defer client.Close()
-
-	// Set the sender and recipient.
-	client.Mail("sender@example.org")
-	client.Rcpt(email)
-
-	// Send the email body.
-	wc, err := client.Data()
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer wc.Close()
-
-	buf := bytes.NewBufferString(body)
-	if _, err = buf.WriteTo(wc); err != nil {
-		log.Fatal(err)
-	}
-
 	return nil
 }

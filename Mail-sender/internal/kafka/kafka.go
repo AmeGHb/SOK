@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strings"
 
+	"mail-sender/config"
 	"mail-sender/internal/mail"
 
 	kafka "github.com/segmentio/kafka-go"
@@ -15,7 +16,11 @@ type ClientR struct {
 	Reader *kafka.Reader
 }
 
-func New(brokers []string, topic string, groupId string) (*ClientR, error) {
+func New(data *ToKafkaStartFunc) (*ClientR, error) {
+
+	brokers := data.KafkaAdress
+	topic := data.Topic
+	groupId := data.GroupID
 
 	if len(brokers) == 0 || brokers[0] == "" || topic == "" || groupId == "" {
 		return nil, errors.New("not given all parameters for kafka client")
@@ -41,7 +46,7 @@ func (c *ClientR) getMessage() (kafka.Message, error) {
 
 // FetchProcessCommit сначала выбирает сообщение из очереди,
 // потом обрабатывает, после чего подтверждает.
-func (c *ClientR) FetchProcessCommit(SMTPPort int) error {
+func (c *ClientR) FetchProcessCommit(conf *config.Config) error {
 	// Выборка очередного сообщения из Kafka.
 	msg, err := c.Reader.FetchMessage(context.Background())
 	if err != nil {
@@ -49,7 +54,7 @@ func (c *ClientR) FetchProcessCommit(SMTPPort int) error {
 	}
 
 	// Обработка сообщения
-	err = messagesHandler(msg.Key, msg.Value, SMTPPort)
+	err = messagesHandler(msg.Value, conf)
 	if err != nil {
 		return err
 	}
@@ -59,11 +64,10 @@ func (c *ClientR) FetchProcessCommit(SMTPPort int) error {
 	return err
 }
 
-func messagesHandler(key, value []byte, SMTPPort int) error {
+func messagesHandler(value []byte, conf *config.Config) error {
 
 	messageV := strings.Split(string(value), " ")
-	email := messageV[0]
-	status := messageV[1]
+	email, status := messageV[0], messageV[1]
 	var body string
 
 	if status == "ok" {
@@ -72,5 +76,5 @@ func messagesHandler(key, value []byte, SMTPPort int) error {
 		body = "Your transaction has not been finished."
 	}
 
-	return mail.SendMail(email, body)
+	return mail.SendMail(email, body, conf)
 }
